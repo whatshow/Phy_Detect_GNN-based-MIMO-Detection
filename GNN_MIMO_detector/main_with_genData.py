@@ -52,14 +52,14 @@ model_name=model.__class__.__name__
 dt_string = datetime.now().strftime("%d_%H:%M:%S")
 
 # Create directories to save trained models and training reports
-for k in ['models','reports']:
+for k in ['train/models','train/reports']:
     if not os.path.exists(k):
         os.makedirs(k)
     else:
         if not os.path.exists(f'{k}/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB'):
             os.makedirs(f'{k}/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB')
     
-f = open(f'reports/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB/log.txt',"w")
+f = open(f'train/reports/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB/log.txt',"w")
 f.write(dt_string + "\n")
 f.write(str(device) + "\n")
 f.close()
@@ -80,19 +80,19 @@ for epoch in range(args['n_epochs']):
 
     # Save best model over epochs
     if (val_acc > val_acc_prev):
-        torch.save(model.state_dict(), f'models/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB/model.pkl')
+        torch.save(model.state_dict(), f'train/models/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB/model.pkl')
         val_acc_prev = val_acc
         train_acc_prev = train_acc
         best_epoch=epoch
     elif (val_acc == val_acc_prev):
         if train_acc >= train_acc_prev:
-            torch.save(model.state_dict(), f'models/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB/model.pkl')
+            torch.save(model.state_dict(), f'train/models/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB/model.pkl')
             train_acc_prev = train_acc
             best_epoch=epoch
     
     model.to(device)
     
-    f = open(f'reports/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB/best_epoch.txt', "w")
+    f = open(f'train/reports/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB/best_epoch.txt', "w")
     f.write(str(best_epoch))
     f.close()
 
@@ -102,11 +102,11 @@ for epoch in range(args['n_epochs']):
     
     df_report=pd.DataFrame(report)
     df_report.set_index('epoch',inplace=True)
-    df_report.to_csv(f'reports/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB/report.csv',index=True)
+    df_report.to_csv(f'train/reports/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB/report.csv',index=True)
     
     
     elapsed = time.time() - t
-    f = open(f'reports/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB/log.txt',"a")
+    f = open(f'train/reports/{model_name}_MMSE_{with_mmse}_{Nr*2}X{Nt*2}_SNR_{snr_db_min}_{snr_db_max}_dB/log.txt',"a")
     f.write("time per epoch: " + str(elapsed) + "\n")
     f.close()
     
